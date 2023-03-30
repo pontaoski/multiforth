@@ -1,0 +1,68 @@
+# multi :)
+
+# over is Pu Du Po Sw
+# rot is Pu Sw Po Sw
+
+# compiler uses this register to keep track of current free address in memory of word being compiled
+c HeapRegister 21
+c CompilerModeRegister 20
+
+# (value addr -> next-addr)
+: StoreNext
+    i Du Li Ad Pu
+    n 1
+    i St Po Re ..
+
+# (str1 str2 -> equal?)
+: String:Equal?
+    # make sure lengths are equal
+    i Pu Du Po Sw
+    i Pu Du Po Sw
+    i Fe Sw Fe Eq
+    r _re
+    i Co .. .. ..
+    # now actually compare memory
+    i Pu Do Po Sw
+    i Fe .. .. ..
+    i Pu Sw Po Sw
+    i Pu Sw Po Sw
+    i Cm Re .. ..
+
+# stores value into address at HeapRegister and increments HeapRegister by one
+: Comma
+    i Li Rr Li Ca
+    u HeapRegister
+    r StoreNext
+    i Li Wr Re ..
+    u HeapRegister
+
+# fetches from address, then tailcalls into Comma
+: CommaOpcode
+    i Fe Li Ju ..
+    r Comma
+
+: _re
+i Re .. .. ..
+
+# semicolon
+: Semicolon
+    i Li Li Ca ..
+    r _re
+    r CommaOpcode
+
+: TurnOffCompiler
+    i Li Li Wr Re
+    n 0
+    u CompilerModeRegister
+
+: _li
+i Li .. .. ..
+
+: Gender:Literal
+    i Li Rr Zr ..
+    u CompilerModeRegister
+    i Dr Li Li Ca
+    r _li
+    r CommaOpcode
+    i Li Ju .. ..
+    r Comma
